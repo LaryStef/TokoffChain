@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     ENVIRONMENT: Literal["development", "production"] = Field(
         default="development",
     )
+    MIN_TRANSACTION_SIZE: float = 0.000_001
+    MAX_TRANSACTION_SIZE: float = 1_000_000_000_000
 
     model_config = SettingsConfigDict(
         env_file=".env",
