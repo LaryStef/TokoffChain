@@ -94,7 +94,7 @@ builtins-ignorelist = []
 allow-dict-calls-with-keyword-arguments = false
 
 [lint.flake8-copyright]
-author = "Vladislav Kuznetsov"
+author = "Timur Tokoff"
 min-file-size = 0
 notice-rgx = "(?i)Copyright\\s+((?:\\(C\\)|©)\\s+)?\\d{4}((-|,\\s)\\d{4})*"
 
