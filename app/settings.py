@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import Literal
 
 from pydantic import Field
@@ -22,13 +23,18 @@ class Settings(BaseSettings):
         f"postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
     )
 
-    MIN_TRANSACTION_SIZE: float = 0.000_001
-    MAX_TRANSACTION_SIZE: float = 1_000_000_000_000
+    NUMBER_PRECISION: int = 18
+    NUMBER_SCALE: int = 6
+    MIN_TRANSACTION_SIZE: Decimal = Decimal(1) / Decimal(NUMBER_SCALE)
+    MAX_TRANSACTION_SIZE: Decimal = Decimal(999) * Decimal(
+        NUMBER_PRECISION / NUMBER_SCALE,
+    )
 
     model_config = SettingsConfigDict(
         env_file=".env",
         case_sensitive=True,
         str_strip_whitespace=True,
+        validate_assignment=True,
     )
 
 
