@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import (
 
 from app.settings import settings
 
-from .models.model import Model
+from .models import Model
 
 
 class DatabaseManager:
