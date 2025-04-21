@@ -6,5 +6,18 @@
             "name": "",
             "depth": 2
         },
-    ]
+    ],
+    "files.exclude": {
+        "**/.git": true,
+        "**/.mypy_cache": true,
+        "**/__pycache__": true,
+        "**/.pytest_cache": true,
+    },
+    "[python]": {
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit",
+            "source.fixAll": "explicit",
+        },
+    }
 }
