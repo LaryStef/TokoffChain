@@ -19,7 +19,7 @@ class Transaction(BaseModel):
             "-[089ab][0-9a-f]{3}-[0-9a-f]{12}$"
         ),
     )]
-    reciever: Annotated[str, Field(
+    recipient: Annotated[str, Field(
         description=(
             "Reciever wallet address in uuid format"
         ),
@@ -32,8 +32,26 @@ class Transaction(BaseModel):
     )]
     amount: Annotated[Decimal, Field(
         description="Amount of transaction",
-        examples=["23.43", "883312"],
+        examples=["23.43"],
         ge=settings.MIN_TRANSACTION_SIZE,
         le=settings.MAX_TRANSACTION_SIZE,
         decimal_places=6,
+    )]
+    hash: Annotated[str, Field(
+        description="Hash of transaction",
+        examples=["0x1234567890abcdef"],
+        min_length=64,
+        max_length=64,
+    )]
+    signature: Annotated[str, Field(
+        description="Signature of transaction",
+        examples=["0x1234567890abcdef"],
+        min_length=140,
+        max_length=142,
+    )]
+    public_key: Annotated[str, Field(
+        description="Public key for signature validation",
+        examples=["0x1234567890abcdef"],
+        min_length=174,
+        max_length=174,
     )]
