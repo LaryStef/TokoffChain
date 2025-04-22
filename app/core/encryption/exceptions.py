@@ -12,6 +12,13 @@ class InvalidKeyTypeError(Exception):
         )
 
 
+class InvalidKeyError(Exception):
+    def __init__(self) -> None:
+        super().__init__(
+            "Invalid public key.",
+        )
+
+
 class InvalidSignatureError(Exception):
     def __init__(self) -> None:
         super().__init__("Invalid signature. The transaction is not valid.")

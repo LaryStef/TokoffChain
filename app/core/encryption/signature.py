@@ -1,7 +1,6 @@
 import hashlib
 import json
 
-from app.api.schemes.transaction import Transaction
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric.ec import (
@@ -11,16 +10,23 @@ from cryptography.hazmat.primitives.asymmetric.ec import (
 from cryptography.hazmat.primitives.serialization import (
     load_pem_public_key,
 )
+from sqlalchemy import exc
+
+from app.api.schemes.transaction import Transaction
 
 from .exceptions import (
     InvalidHashError,
+    InvalidKeyError,
     InvalidKeyTypeError,
     InvalidSignatureError,
 )
 
 
 def verify_transaction(transaction: Transaction) -> None:
-    public_key = load_pem_public_key(transaction.public_key.encode("utf-8"))
+    try:
+        public_key = load_pem_public_key(transaction.public_key.encode("utf-8"))
+    except ValueError:
+        raise InvalidKeyError from None
 
     if not isinstance(public_key, EllipticCurvePublicKey):
         raise InvalidKeyTypeError(public_key)
