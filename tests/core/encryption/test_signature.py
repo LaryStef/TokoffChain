@@ -12,10 +12,6 @@ from cryptography.hazmat.primitives.asymmetric.ec import (
 from cryptography.hazmat.primitives.asymmetric.ec import (
     generate_private_key as generate_ec_private_key,
 )
-from cryptography.hazmat.primitives.asymmetric.padding import MGF1, PSS
-from cryptography.hazmat.primitives.asymmetric.rsa import (
-    RSAPrivateKey,
-)
 from cryptography.hazmat.primitives.asymmetric.rsa import (
     generate_private_key as generate_rsa_private_key,
 )
@@ -32,65 +28,6 @@ from app.core.encryption.exceptions import (
     InvalidSignatureError,
 )
 from app.core.encryption.signature import verify_transaction
-
-
-# def _rsa_sign(
-#     private_key: RSAPrivateKey,
-#     serialized_transaction: bytes,
-# ) -> bytes:
-#     return private_key.sign(
-#         serialized_transaction,
-#         padding=PSS(mgf=MGF1(hashes.SHA256()), salt_length=PSS.MAX_LENGTH),
-#         algorithm=hashes.SHA256(),
-#     )
-
-# def _ec_sign(
-#     private_key: EllipticCurvePrivateKey,
-#     serialized_transaction: bytes,
-# ) -> bytes:
-#     return private_key.sign(
-#         serialized_transaction,
-#         ECDSA(hashes.SHA256()),
-#     )
-
-
-# def _sign_transaction(
-#     sender: str,
-#     recipient: str,
-#     amount: str,
-#     private_key: RSAPrivateKey | EllipticCurvePrivateKey,
-# ) -> Transaction:
-#     public_key = private_key.public_key()
-#     public_key_pem = public_key.public_bytes(
-#         encoding=Encoding.PEM,
-#         format=PublicFormat.SubjectPublicKeyInfo,
-#     ).decode("utf-8")
-
-#     transaction_json: dict[str, str] = {
-#         "sender": sender,
-#         "recipient": recipient,
-#         "amount": amount,
-#         "public_key": public_key_pem,
-#     }
-
-#     serialized_transaction = json.dumps(
-#         transaction_json,
-#         sort_keys=True,
-#     ).encode("utf-8")
-#     _hash = hashlib.sha256(serialized_transaction).hexdigest()
-#     if isinstance(private_key, EllipticCurvePrivateKey):
-#         signature = _ec_sign(private_key, serialized_transaction)
-#     else:
-#         signature = _rsa_sign(private_key, serialized_transaction)
-
-#     return Transaction(
-#         sender=sender,
-#         recipient=recipient,
-#         amount=Decimal(amount),
-#         signature=signature.hex(),
-#         hash=_hash,
-#         public_key=public_key_pem,
-#     )
 
 
 @pytest.fixture()
