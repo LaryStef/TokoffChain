@@ -1,0 +1,42 @@
+name: "tests"
+
+on:
+  push:
+    branches: [ "main" ]
+    paths-ignore:
+        - ".vscode/**"
+        - ".gitignore"
+        - "LICENSE"
+        - "README.md"
+  pull_request:
+    branches: [ "main" ]
+    paths-ignore:
+        - ".vscode/**"
+        - ".gitignore"
+        - "LICENSE"
+        - "README.md"
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.13"
+
+    - name: Install poetry
+      run: pip install --upgrade poetry && poetry config virtualenvs.create false
+    
+    - name: Install dependencies
+      run: poetry install
+    
+    - name: Run tests
+      run: pytest
