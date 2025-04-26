@@ -10,7 +10,6 @@ from cryptography.hazmat.primitives.asymmetric.ec import (
 from cryptography.hazmat.primitives.serialization import (
     load_pem_public_key,
 )
-from sqlalchemy import exc
 
 from app.api.schemes.transaction import Transaction
 

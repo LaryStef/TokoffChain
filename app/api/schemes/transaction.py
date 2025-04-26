@@ -47,7 +47,7 @@ class Transaction(BaseModel):
         description="Signature of transaction",
         examples=["0x1234567890abcdef"],
         min_length=140,
-        max_length=142,
+        max_length=144,
     )]
     public_key: Annotated[str, Field(
         description="Public key for signature validation",
