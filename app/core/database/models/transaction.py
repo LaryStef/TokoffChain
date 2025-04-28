@@ -15,7 +15,7 @@ class Transaction(Model, CreatedAtMixin):
     id: Mapped[str] = mapped_column(
         String(36),
         primary_key=True,
-        default_factory=uuid4,
+        default=uuid4,
     )
     sender: Mapped[str] = mapped_column(
         ForeignKey(Wallet.address),
