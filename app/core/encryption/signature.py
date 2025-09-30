@@ -23,7 +23,9 @@ from .exceptions import (
 
 def verify_transaction(transaction: Transaction) -> None:
     try:
-        public_key = load_pem_public_key(transaction.public_key.encode("utf-8"))
+        public_key = load_pem_public_key(
+            transaction.public_key.encode("utf-8"),
+        )
     except ValueError:
         raise InvalidKeyError from None
 

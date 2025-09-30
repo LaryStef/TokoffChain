@@ -4,7 +4,11 @@ from cryptography.hazmat.primitives.asymmetric.types import (
 )
 
 
-class InvalidKeyTypeError(Exception):
+class InvalidTransactionError(Exception):
+    pass
+
+
+class InvalidKeyTypeError(InvalidTransactionError):
     def __init__(self, key: PublicKeyTypes | PrivateKeyTypes) -> None:
         super().__init__(
             f"Invalid key type: {type(key)}."
@@ -12,19 +16,19 @@ class InvalidKeyTypeError(Exception):
         )
 
 
-class InvalidKeyError(Exception):
+class InvalidKeyError(InvalidTransactionError):
     def __init__(self) -> None:
         super().__init__(
             "Invalid public key.",
         )
 
 
-class InvalidSignatureError(Exception):
+class InvalidSignatureError(InvalidTransactionError):
     def __init__(self) -> None:
         super().__init__("Invalid signature. The transaction is not valid.")
 
 
-class InvalidHashError(Exception):
+class InvalidHashError(InvalidTransactionError):
     def __init__(self) -> None:
         super().__init__(
             "Invalid hash."

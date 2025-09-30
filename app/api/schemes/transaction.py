@@ -39,19 +39,28 @@ class Transaction(BaseModel):
     )]
     hash: Annotated[str, Field(
         description="Hash of transaction",
-        examples=["0x1234567890abcdef"],
+        examples=[
+            "daa4561fc476bcd85d74d97e0d322b0e56297a76dd0254f9c459f174937"
+            "4e65b",
+        ],
         min_length=64,
         max_length=64,
     )]
     signature: Annotated[str, Field(
         description="Signature of transaction",
-        examples=["0x1234567890abcdef"],
+        examples=[
+            "30450220046cb66059b69ef5a521a042ee7352b83aac5ba8129338129047cd547"
+            "ce24a30022100d68c4db563f4596a0c120fe117ee5c5edf380c54293c1319c1b4"
+            "9a8c71f7ac5b",
+        ],
         min_length=140,
         max_length=144,
     )]
     public_key: Annotated[str, Field(
         description="Public key for signature validation",
-        examples=["0x1234567890abcdef"],
+        examples=[
+            "-----BEGIN PUBLIC KEY-----MFYwEAYHKoZIzj-----END PUBLIC KEY-----",
+        ],
         min_length=174,
         max_length=174,
     )]
