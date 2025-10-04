@@ -1,0 +1,132 @@
+name: build-deb
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Read version
+        id: ver
+        shell: bash
+        run: |
+          VERSION=$(grep -Po '(?<=version = ")[0-9]+\.[0-9]+\.[0-9]+' pyproject.toml)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Prepare minimal DEB structure
+        shell: bash
+        run: |
+          set -e
+          # Create package directories
+          mkdir -p pkg/DEBIAN
+          mkdir -p pkg/opt/tokoffchain
+          mkdir -p pkg/usr/bin
+          
+          # Copy app sources (simple packaging of sources)
+          cp -r app pkg/opt/tokoffchain/
+          # Optional extras for convenience
+          [ -f README.md ] && cp README.md pkg/opt/tokoffchain/ || true
+          [ -f pyproject.toml ] && cp pyproject.toml pkg/opt/tokoffchain/ || true
+          
+          # Create a very simple launcher
+          cat > pkg/usr/bin/tokoffchain << 'EOF'
+          #!/bin/sh
+          set -e
+          APP_DIR="/opt/tokoffchain"
+          VENV_DIR="$APP_DIR/.venv"
+
+          cd "$APP_DIR"
+
+          # Use virtualenv if present, else fallback to system Python
+          if [ -x "$VENV_DIR/bin/python" ]; then
+            PY="$VENV_DIR/bin/python"
+          else
+            PY="$(command -v python3 || true)"
+          fi
+
+          if [ -z "$PY" ]; then
+            echo "python3 not found. Please install Python 3." >&2
+            exit 1
+          fi
+
+          exec "$PY" -m app "$@"
+          EOF
+          chmod +x pkg/usr/bin/tokoffchain
+
+      - name: Export Python requirements with Poetry
+        shell: bash
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install --upgrade poetry
+          poetry export -f requirements.txt -o pkg/opt/tokoffchain/requirements.txt --without-hashes
+
+      - name: Create DEBIAN/control
+        shell: bash
+        run: |
+          cat > pkg/DEBIAN/control << EOF
+          Package: tokoffchain
+          Version: ${{ steps.ver.outputs.version }}
+          Section: utils
+          Priority: optional
+          Architecture: all
+          Maintainer: ${{ github.repository_owner }}
+          Depends: python3, python3-venv, python3-pip, ca-certificates
+          Description: Minimal DEB for TokoffChain (FastAPI app)
+           Installs sources to /opt/tokoffchain and a launcher /usr/bin/tokoffchain.
+           Post-install will create a virtualenv in /opt/tokoffchain/.venv and install Python deps from requirements.txt.
+          EOF
+
+      - name: Create DEBIAN/postinst
+        shell: bash
+        run: |
+          cat > pkg/DEBIAN/postinst << 'EOF'
+          #!/bin/sh
+          set -e
+
+          APP_DIR="/opt/tokoffchain"
+          VENV_DIR="$APP_DIR/.venv"
+          REQ_FILE="$APP_DIR/requirements.txt"
+
+          case "$1" in
+            configure|"")
+              if [ ! -x "$VENV_DIR/bin/python" ]; then
+                python3 -m venv "$VENV_DIR"
+              fi
+              "$VENV_DIR/bin/python" -m pip install --upgrade pip
+              if [ -f "$REQ_FILE" ]; then
+                "$VENV_DIR/bin/pip" install --no-cache-dir -r "$REQ_FILE"
+              fi
+              ;;
+          esac
+
+          #DEBHELPER#
+          exit 0
+          EOF
+          chmod 755 pkg/DEBIAN/postinst
+
+      - name: Build .deb
+        shell: bash
+        run: |
+          DEB_NAME="tokoffchain_${{ steps.ver.outputs.version }}_all.deb"
+          dpkg-deb --build pkg "$DEB_NAME"
+          echo "deb_name=$DEB_NAME" >> $GITHUB_OUTPUT
+        id: build
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.build.outputs.deb_name }}
+          path: ${{ steps.build.outputs.deb_name }}
+          retention-days: 7
